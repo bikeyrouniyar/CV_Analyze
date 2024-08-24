@@ -1,0 +1,13 @@
+prefix=/Users/bi-ky/Documents/conda/venv
+exec_prefix=/Users/bi-ky/Documents/conda/venv
+libdir=/Users/bi-ky/Documents/conda/venv/lib
+sharedlibdir=/Users/bi-ky/Documents/conda/venv/lib
+includedir=/Users/bi-ky/Documents/conda/venv/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.13
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}
