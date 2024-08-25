@@ -15,26 +15,44 @@ genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 # Define functions for processing and generating content
 def geminiResponse(input, pdfContent, prompt):
     model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content([input, pdfContent[0], prompt])
+    response = model.generate_content([input, pdfContent, prompt])
     return response.text
 
 def inputPdf(uploaded_file):
     if uploaded_file is not None:
         pdf_document = fitz.open(stream=uploaded_file.read(), filetype="pdf")
-        pdf_parts = []
+        images = []
 
-        # Loop through all pages
+        # Loop through all pages and render them as images
         for page_number in range(len(pdf_document)):
             page = pdf_document.load_page(page_number)  # Get the page
             pix = page.get_pixmap()  # Render page to an image
-            img_byt_arr = io.BytesIO(pix.tobytes("jpeg"))  # Save as JPEG bytes
+            img = Image.open(io.BytesIO(pix.tobytes("png")))  # Save as PNG for better compatibility
+            images.append(img)
 
-            pdf_parts.append({
-                "mime_type": "image/jpeg",
-                "data": base64.b64encode(img_byt_arr.getvalue()).decode()
-            })
+        # Combine images into a single image
+        widths, heights = zip(*(img.size for img in images))
+        total_height = sum(heights)
+        max_width = max(widths)
 
-        return pdf_parts
+        combined_image = Image.new('RGB', (max_width, total_height))
+
+        y_offset = 0
+        for img in images:
+            combined_image.paste(img, (0, y_offset))
+            y_offset += img.height
+
+        # Convert combined image to bytes
+        img_byt_arr = io.BytesIO()
+        combined_image.save(img_byt_arr, format="JPEG")
+        img_byt_arr = img_byt_arr.getvalue()
+
+        pdf_part = {
+            "mime_type": "image/jpeg",
+            "data": base64.b64encode(img_byt_arr).decode()
+        }
+
+        return pdf_part
     else:
         raise FileNotFoundError("No File Uploaded")
 
