@@ -1,6 +1,6 @@
 import base64
 
-import pdf2image
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,7 +12,7 @@ from PIL import Image
 import pdf2image as pdf
 import google.generativeai as genai
 
-genai.configure(api_key=os.getenv(key="GOOGLE_API_KEY"))
+genai.configure(api_key="")
 
 
 def geminiResponse(input, pdfContent, prompt):
@@ -58,8 +58,8 @@ input_Prompt1 = (
     "such as adding relevant keywords, refining content, or addressing skill deficiencies. Ensure the feedback is clear and concise,"
     " helping the candidate to enhance their resume's relevance and increase their chances of success.")
 input_Prompt2 = (
-    "Evaluate the resume against the provided job description and calculate the ATS percentage score. Determine how closely the resume matches the job requirements, considering keywords, skills, experience, and education. "
-    "Provide a clear score reflecting the alignment, and briefly indicate key factors that contributed to the score, such as missing keywords or mismatched qualifications.")
+    "Calculate the ATS compatibility percentage for the provided resume against the job description for [Job Title]. "
+    "Evaluate how closely the resume matches the job requirements based on keywords, skills, experience, and education.")
 
 if submit1:
     if uploaded_files is not None:
